@@ -1,0 +1,163 @@
+// ============================================================
+// apps/api/prisma/schema.prisma
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------
+// Enums — kept in sync with shared Zod schemas
+// ------------------------------------------------------------
+
+enum PactType {
+  TRADE
+  GOAL
+}
+
+enum PactStatus {
+  PENDING
+  ACTIVE
+  PROOF_SUBMITTED
+  COMPLETE
+  DISPUTED
+  CANCELLED
+  EXPIRED
+}
+
+// ------------------------------------------------------------
+// Pact
+// ------------------------------------------------------------
+
+model Pact {
+  id                 String     @id @default(uuid())
+  type               PactType
+  status             PactStatus @default(PENDING)
+
+  // Parties
+  creatorWallet      String
+  counterpartyWallet String
+
+  // TRADE fields
+  itemName           String?    @db.VarChar(120)
+  itemDescription    String?    @db.VarChar(1000)
+  location           String?    @db.VarChar(200)
+  scheduledAt        DateTime?
+
+  // Value (stored flat; formatted string derived at query time)
+  assetSymbol        String
+  assetAmount        Float
+
+  // GOAL fields
+  goalDescription    String?    @db.VarChar(1000)
+  goalDeadline       DateTime?
+
+  // Proof
+  proofUrl           String?
+  proofSubmittedAt   DateTime?
+
+  // On-chain
+  txHash             String?
+  contractAddress    String?
+
+  // Timestamps
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  // Relations
+  qrNonces           QrNonce[]
+
+  @@index([creatorWallet])
+  @@index([counterpartyWallet])
+  @@index([creatorWallet, createdAt, id])
+  @@index([counterpartyWallet, createdAt, id])
+  @@index([status])
+  @@index([type])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  wallet    String
+  title     String   @db.VarChar(120)
+  body      String   @db.VarChar(500)
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([wallet, createdAt])
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  wallet    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([wallet])
+}
+
+// ------------------------------------------------------------
+// Profile
+// ------------------------------------------------------------
+
+model Profile {
+  wallet         String   @id
+  displayName    String?  @db.VarChar(80)
+  avatarUrl      String?
+  email          String?
+
+  totalPacts     Int      @default(0)
+  completedPacts Int      @default(0)
+  disputedPacts  Int      @default(0)
+  successRate    Float    @default(0)
+
+  trustScore     Int?
+  joinedAt       DateTime @default(now())
+
+  totpSecret     String?
+  totpEnabled    Boolean  @default(false)
+}
+
+// ------------------------------------------------------------
+// Session
+// ------------------------------------------------------------
+
+model Session {
+  id          String    @id @default(uuid())
+  wallet      String
+  connectedAt DateTime  @default(now())
+  expiresAt   DateTime?
+  chainId     Int
+  chainName   String
+
+  deviceName  String?
+  location    String?
+  isCurrent   Boolean   @default(false)
+
+  @@index([wallet])
+}
+
+// ------------------------------------------------------------
+// QrNonce — short-lived nonces for QR-based pact verification
+// ------------------------------------------------------------
+
+model QrNonce {
+  id        String   @id @default(uuid())
+  pactId    String
+  nonce     String   @unique @default(uuid())
+  expiresAt DateTime
+  used      Boolean  @default(false)
+
+  pact      Pact     @relation(fields: [pactId], references: [id], onDelete: Cascade)
+
+  @@index([nonce])
+  @@index([pactId])
+}

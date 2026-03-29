@@ -1,0 +1,105 @@
+# ── Apex domain (behind Cloudflare) — HTTP only ────────────────
+# Cloudflare terminates TLS for the user; VPS receives plain HTTP from CF.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __DOMAIN__;
+    client_max_body_size 20m;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:__API_PORT__;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+    location / {
+        proxy_pass http://127.0.0.1:__WEB_PORT__;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+
+# ── app subdomain — HTTP → HTTPS redirect ─────────────────────
+server {
+    listen 80;
+    listen [::]:80;
+    server_name app.__DOMAIN__;
+    return 301 https://$host$request_uri;
+}
+
+# ── api subdomain — HTTP → HTTPS redirect ─────────────────────
+server {
+    listen 80;
+    listen [::]:80;
+    server_name api.__DOMAIN__;
+    return 301 https://$host$request_uri;
+}
+
+# ── app subdomain — HTTPS ──────────────────────────────────────
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name app.__DOMAIN__;
+    client_max_body_size 20m;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    ssl_certificate     __CERT_DIR__/fullchain.pem;
+    ssl_certificate_key __CERT_DIR__/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:__API_PORT__;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+    location / {
+        proxy_pass http://127.0.0.1:__WEB_PORT__;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+
+# ── api subdomain — HTTPS ──────────────────────────────────────
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name api.__DOMAIN__;
+    client_max_body_size 20m;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    ssl_certificate     __CERT_DIR__/fullchain.pem;
+    ssl_certificate_key __CERT_DIR__/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:__API_PORT__;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}

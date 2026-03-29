@@ -1,0 +1,142 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --sm-background: #131315;
+  --sm-surface: #201f22;
+  --sm-surface-high: #2a2a2c;
+  --sm-surface-highest: #353437;
+  --sm-on-surface: #e5e1e4;
+  --sm-on-surface-variant: #cac3d8;
+  --sm-outline: #938ea1;
+  --sm-outline-variant: #484455;
+  --sm-primary: #ccbeff;
+  --sm-primary-container: #7d56fe;
+  --sm-secondary-container: #3892f8;
+  --sm-tertiary: #cdc7af;
+  --sm-error: #ffb4ab;
+  --sm-error-container: #93000a;
+
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #262626;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --destructive: #dc2626;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #a1a1aa;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: var(--sm-background);
+  --foreground: var(--sm-on-surface);
+  --card: var(--sm-surface);
+  --card-foreground: var(--sm-on-surface);
+  --popover: var(--sm-surface-high);
+  --popover-foreground: var(--sm-on-surface);
+  --primary: var(--sm-primary-container);
+  --primary-foreground: #ffffff;
+  --secondary: var(--sm-surface-high);
+  --secondary-foreground: var(--sm-on-surface);
+  --muted: var(--sm-surface-high);
+  --muted-foreground: var(--sm-on-surface-variant);
+  --accent: var(--sm-surface-highest);
+  --accent-foreground: var(--sm-on-surface);
+  --destructive: var(--sm-error);
+  --border: color-mix(in oklab, var(--sm-outline) 24%, transparent);
+  --input: color-mix(in oklab, var(--sm-outline) 30%, transparent);
+  --ring: color-mix(in oklab, var(--sm-primary) 55%, transparent);
+}
+
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-body: var(--font-body);
+  --font-headline: var(--font-headline);
+  --font-heading: var(--font-headline);
+
+  --color-background: var(--sm-background);
+  --color-surface: var(--sm-surface);
+  --color-surface-high: var(--sm-surface-high);
+  --color-surface-highest: var(--sm-surface-highest);
+  --color-on-surface: var(--sm-on-surface);
+  --color-on-surface-variant: var(--sm-on-surface-variant);
+  --color-outline: var(--sm-outline);
+  --color-outline-variant: var(--sm-outline-variant);
+  --color-primary: var(--sm-primary);
+  --color-primary-container: var(--sm-primary-container);
+  --color-secondary-container: var(--sm-secondary-container);
+  --color-tertiary: var(--sm-tertiary);
+  --color-error: var(--sm-error);
+  --color-error-container: var(--sm-error-container);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-foreground: var(--foreground);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.surface-card {
+  @apply rounded-xl border border-white/10 bg-surface;
+}
+
+.section-wrap {
+  margin-inline: auto;
+  width: min(1240px, calc(100% - 2.5rem));
+}
+
+.sm-glow {
+  position: absolute;
+  inset: auto;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(110px);
+}
+
+.logo-ring {
+  stroke-width: 2.2;
+  fill: none;
+}

@@ -1,0 +1,10 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0C1015"/>
+  <circle cx="1040" cy="120" r="220" fill="#1F3D73" fill-opacity="0.38"/>
+  <circle cx="120" cy="540" r="240" fill="#1F7A6A" fill-opacity="0.32"/>
+  <rect x="120" y="140" width="960" height="350" rx="28" fill="#141B23" stroke="#2A3440"/>
+  <text x="180" y="255" fill="#E7EDF5" font-size="76" font-family="Arial, sans-serif" font-weight="700">SafeMeet</text>
+  <text x="180" y="320" fill="#A9B6C7" font-size="34" font-family="Arial, sans-serif">Trustless Escrow Protocol</text>
+  <text x="180" y="380" fill="#7CC9B7" font-size="28" font-family="Arial, sans-serif">Create • Share • Accept • Verify</text>
+  <text x="180" y="442" fill="#8EA3BD" font-size="24" font-family="Arial, sans-serif">Built on Base Sepolia</text>
+</svg>

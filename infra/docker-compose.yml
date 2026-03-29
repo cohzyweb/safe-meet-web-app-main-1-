@@ -1,0 +1,125 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: safe-meet-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: safemeet
+      POSTGRES_USER: safemeet
+      POSTGRES_PASSWORD: safemeet_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U safemeet -d safemeet"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: safe-meet-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  web_blue:
+    image: "safe-meet-app:blue"
+    container_name: safe-meet-web-blue
+    restart: unless-stopped
+    working_dir: /app/apps/web
+    command: ["sh", "-lc", "HOSTNAME=0.0.0.0 PORT=3000 pnpm start"]
+    env_file:
+      - ../.env.web
+    depends_on:
+      api_blue:
+        condition: service_started
+    ports:
+      - "127.0.0.1:3101:3000"
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  web_green:
+    image: "safe-meet-app:green"
+    container_name: safe-meet-web-green
+    restart: unless-stopped
+    working_dir: /app/apps/web
+    command: ["sh", "-lc", "HOSTNAME=0.0.0.0 PORT=3000 pnpm start"]
+    env_file:
+      - ../.env.web
+    depends_on:
+      api_green:
+        condition: service_started
+    ports:
+      - "127.0.0.1:3102:3000"
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  api_blue:
+    image: "safe-meet-app:blue"
+    container_name: safe-meet-api-blue
+    restart: unless-stopped
+    working_dir: /app/apps/api
+    command: ["sh", "-lc", "HOST=0.0.0.0 PORT=4000 pnpm start"]
+    env_file:
+      - ../.env.api
+    volumes:
+      - ../logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:4101:4000"
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  api_green:
+    image: "safe-meet-app:green"
+    container_name: safe-meet-api-green
+    restart: unless-stopped
+    working_dir: /app/apps/api
+    command: ["sh", "-lc", "HOST=0.0.0.0 PORT=4000 pnpm start"]
+    env_file:
+      - ../.env.api
+    volumes:
+      - ../logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:4102:4000"
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+  redis_data:

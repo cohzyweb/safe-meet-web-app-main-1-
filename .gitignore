@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Build outputs
+apps/web/.next/
+apps/web/out/
+apps/web/build/
+apps/api/dist/
+packages/shared/dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Testing
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Database
+*.db
+*.sqlite
+
+# Misc
+*.pem
+.cache/
+temp/
+tmp/
+
+# Local deployment artifacts
+.turbo/
+**/.turbo/
+.deploy_ssh_key
+.deploy_ssh_key.pub

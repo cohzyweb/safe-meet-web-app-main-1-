@@ -1,0 +1,13 @@
+{
+  "name": "@safe-meet/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "node deploy.mjs"
+  },
+  "dependencies": {
+    "solc": "^0.8.26",
+    "viem": "^2.0.0"
+  }
+}
